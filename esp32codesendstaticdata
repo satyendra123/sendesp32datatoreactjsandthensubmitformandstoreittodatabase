@@ -43,10 +43,10 @@ void loop() {
 void kirim_data() {
 
   int voltage, current, watt, average;
-  voltage = random(0, 12); // ubah dengan data dari sensor
-  current = random(0, 3); // ubah dengan data dari sensor
-  watt = random(28, 32); // ubah dengan data dari sensor
-  average = random(50, 95); // ubah dengan data dari sensor
+  voltage = random(0, 12); // voltage data
+  current = random(0, 3); // current data
+  watt = random(28, 32); // watt data
+  average = random(50, 95); // average data
 
   String postData = (String)"voltage=" + voltage + "&current=" + current
                     + "&watt=" + watt + "&average=" + average;
