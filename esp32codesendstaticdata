@@ -1,0 +1,57 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+String URL = "http://computer_ip/project_folder/project_file.php";
+
+const char* ssid = "ENTER_WIFI_SSID"; 
+const char* password = "ENTER_WIFI_PASSWORD"; 
+
+float temperature = 25.0; // Static temperature value
+float humidity = 60.0; // Static humidity value
+
+void setup() {
+  Serial.begin(115200);
+  connectWiFi();
+}
+
+void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    connectWiFi();
+  }
+
+  sendData();
+  delay(5000); // Send data every 5 seconds
+}
+
+void sendData() {
+  String postData = "temperature=" + String(temperature) + "&humidity=" + String(humidity);
+  
+  HTTPClient http;
+  http.begin(URL);
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  
+  int httpCode = http.POST(postData);
+  String payload = http.getString();
+
+  Serial.print("URL: "); Serial.println(URL); 
+  Serial.print("Data: "); Serial.println(postData);
+  Serial.print("HTTP Code: "); Serial.println(httpCode);
+  Serial.print("Payload: "); Serial.println(payload);
+  Serial.println("--------------------------------------------------");
+  
+  http.end();
+}
+
+void connectWiFi() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting to WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  
+  Serial.print("Connected to: "); Serial.println(ssid);
+  Serial.print("IP Address: "); Serial.println(WiFi.localIP());
+}
