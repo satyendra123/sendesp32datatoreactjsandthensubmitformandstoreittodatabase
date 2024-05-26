@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
-const char *ssid = "Smart-PF";  //Nama Wifi
-const char *password = "anamganteng"; // pass wifi
+const char *ssid = "Airtel_tejv_3002";  //Nama Wifi
+const char *password = "air73137"; // pass wifi
 
 void setup() {
   delay(1000);
