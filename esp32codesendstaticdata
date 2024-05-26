@@ -1,3 +1,4 @@
+//EXAMPLE-1 actually i don't have the DHT sensor so i will send the random data through the http post method
 #include <WiFi.h>
 #include <HTTPClient.h>
 const char *ssid = "Airtel_tejv_3002";  //Nama Wifi
@@ -41,14 +42,14 @@ void loop() {
 
 void kirim_data() {
 
-  int tegangan, arus, suhu, kelembaban;
-  tegangan = random(0, 12); // ubah dengan data dari sensor
-  arus = random(0, 3); // ubah dengan data dari sensor
-  suhu = random(28, 32); // ubah dengan data dari sensor
-  kelembaban = random(50, 95); // ubah dengan data dari sensor
+  int voltage, current, watt, average;
+  voltage = random(0, 12); // ubah dengan data dari sensor
+  current = random(0, 3); // ubah dengan data dari sensor
+  watt = random(28, 32); // ubah dengan data dari sensor
+  average = random(50, 95); // ubah dengan data dari sensor
 
-  String postData = (String)"tegangan=" + tegangan + "&arus=" + arus
-                    + "&suhu=" + suhu + "&kelembaban=" + kelembaban;
+  String postData = (String)"voltage=" + voltage + "&current=" + current
+                    + "&watt=" + watt + "&average=" + average;
 
   HTTPClient http;
   http.begin("http://192.168.43.140/postesp8266/api.php");
@@ -62,7 +63,8 @@ void kirim_data() {
 
   http.end();
 }
-dan jika program diatas sudah bisa, langsung mencoba program dengan sensor DHT11 untuk mengirim data suhu dan kelembaban ke database MySQL dengan ESP32
+
+// EXAMPLE-2 ESP32 with DHT sensor store the data into the database Mysql
 
 #include <WiFi.h>
 #include <HTTPClient.h>
