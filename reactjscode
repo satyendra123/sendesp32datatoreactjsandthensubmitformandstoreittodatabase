@@ -18,7 +18,7 @@ const Esp32form = () => {
   });
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/sensor-data/')
+    axios.get('http://192.168.1.29:3000/api/sendsensordata')
       .then(response => {
         const { voltage, current, watt, average } = response.data;
         setFormData(prevState => ({
@@ -87,7 +87,7 @@ const Esp32form = () => {
 };
 
 export default Esp32form;
-*/
+
 
 /* EXAMPLE-2 in this code i need to refresh the webpage 
 import React, { useState, useEffect } from 'react';
@@ -137,7 +137,7 @@ export default Esp32form;
 */
 
 /* EXAMPLE-3 this will fetch the data at regular interval whether as in the previous above code i need to refresh the webpage manually to see the data */
-
+/*
 import React, { useState, useEffect } from 'react';
 
 const Esp32form= () => {
@@ -145,7 +145,7 @@ const Esp32form= () => {
 useEffect(() => {
   const fetchData = async () => {
     try {
-      const response = await fetch('http://192.168.1.29:3000/api/sensordata');
+      const response = await fetch('http://192.168.1.29:3000/api/sendsensordata');
       
       // Check for a 403 status code
       if (response.status === 403) {
@@ -187,6 +187,7 @@ return (
 };
 
 export default Esp32form;
+*/
 #Step-2 Esp32form.css
 .form-container {
     max-width: 400px;
