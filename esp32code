@@ -1,0 +1,122 @@
+#Step-1 esp32 micropython code
+import network
+import urequests as requests
+import time
+import json
+from random import randint
+
+# WiFi credentials
+ssid = 'Airtel_tejv_3002'
+password = 'air73137'
+
+# Connect to WiFi
+station = network.WLAN(network.STA_IF)
+station.active(True)
+station.connect(ssid, password)
+
+print('Connecting to WiFi', end='')
+
+while not station.isconnected():
+    print('.', end='')
+    time.sleep(0.5)
+
+print('\nConnected to WiFi')
+print('IP address:', station.ifconfig()[0])
+
+# Function to simulate sensor data
+def read_sensor_data():
+    voltage = randint(0, 12)
+    current = randint(0, 3)
+    watt = randint(28, 32)
+    average = randint(50, 95)
+    return voltage, current, watt, average
+
+# Function to send sensor data
+def send_sensor_data():
+    voltage, current, watt, average = read_sensor_data()
+    postData = {
+        'voltage': voltage,
+        'current': current,
+        'watt': watt,
+        'average': average
+    }
+
+    url = 'http://192.168.1.29:3000/api/sensordata'  # Replace with the correct IP address and port
+    headers = {'Content-Type': 'application/json'}
+
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(postData))
+        print('httpCode:', response.status_code)
+        if response.status_code > 0 and response.status_code < 400:
+            print(response.text)
+    except Exception as e:
+        print('Error:', e)
+
+while True:
+    send_sensor_data()
+    time.sleep(10)  # Send data every 10 seconds
+
+#Step-2 arduino code
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+const char* ssid = "Airtel_tejv_3002";  // WiFi SSID
+const char* password = "air73137";      // WiFi password
+
+void setup() {
+  Serial.begin(115200);
+
+  // Connect to WiFi
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting to WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.println("Connected to WiFi");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void loop() {
+  // Simulate reading sensor data
+  int voltage = random(0, 12);
+  int current = random(0, 3);
+  int watt = random(28, 32);
+  int average = random(50, 95);
+
+  // Create JSON data
+  String postData = "{\"voltage\":" + String(voltage) + ",\"current\":" + String(current) + ",\"watt\":" + String(watt) + ",\"average\":" + String(average) + "}";
+
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String serverPath = "http://192.168.1.29:3000/api/sensordata";  // Replace with the correct IP address and port
+
+    // Log the endpoint and data
+    Serial.println("Posting to: " + serverPath);
+    Serial.println("PostPacket: " + postData);
+    
+    http.begin(serverPath);
+    http.addHeader("Content-Type", "application/json");  // Changed to application/json
+
+    int httpResponseCode = http.POST(postData);
+
+    // Print HTTP response code and payload
+    Serial.print("httpCode: ");
+    Serial.println(httpResponseCode);
+
+    if (httpResponseCode > 0 && httpResponseCode < 400) {
+      String response = http.getString();
+      Serial.println(response);
+    }
+
+    http.end();
+  } else {
+    Serial.println("WiFi Disconnected");
+  }
+
+  delay(10000);  // Send data every 10 seconds
+}
