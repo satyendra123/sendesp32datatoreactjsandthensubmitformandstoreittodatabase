@@ -1,0 +1,45 @@
+# i have also written the python rest api code 
+#Step-1 views.py code
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+sensor_data = None
+
+@csrf_exempt
+def receive_sensor_data(request):
+    global sensor_data
+    if request.method == 'POST':
+        try:
+            sensor_data = json.loads(request.body)
+            print(sensor_data)
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            print(f'Error receiving data: {e}')
+            return JsonResponse({"status": "error"}, status=400)
+    return JsonResponse({"status": "error"}, status=405)
+
+def get_sensor_data(request):
+    global sensor_data
+    if sensor_data:
+        return JsonResponse(sensor_data, status=200, safe=False)
+    else:
+        return JsonResponse({"error": "No data available"}, status=404)
+
+#Step-2 urls.py
+from django.urls import path
+from .views import receive_sensor_data, get_sensor_data
+
+urlpatterns = [
+    path('api/sensordata', receive_sensor_data, name='receive_sensor_data'),
+    path('api/sendsensordata', get_sensor_data, name='get_sensor_data'),
+]
+
+#Step-3 main urls.py
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('sensorapp.urls')),
+]
