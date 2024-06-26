@@ -1,5 +1,143 @@
 #react js code
 #Step-1 Esp32form.js
+/*
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './Esp32form.css';
+
+const Esp32form = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    age: '',
+    rollNumber: '',
+    class: '',
+    voltage: '',
+    current: '',
+    watt: '',
+    average: ''
+  });
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/api/sensor-data/')
+      .then(response => {
+        const { voltage, current, watt, average } = response.data;
+        setFormData(prevState => ({
+          ...prevState,
+          voltage,
+          current,
+          watt,
+          average
+        }));
+      })
+      .catch(error => {
+        console.error('Error fetching sensor data', error);
+      });
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios.post('http://localhost:8000/api/submit-form/', formData)
+      .then(response => {
+        console.log('Data submitted successfully', response);
+      })
+      .catch(error => {
+        console.error('Error submitting data', error);
+      });
+  };
+
+  return (
+    <div className="form-container">
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="name">Name</label>
+        <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
+
+        <label htmlFor="age">Age</label>
+        <input type="number" id="age" name="age" value={formData.age} onChange={handleChange} placeholder="Age" required />
+
+        <label htmlFor="rollNumber">Roll Number</label>
+        <input type="text" id="rollNumber" name="rollNumber" value={formData.rollNumber} onChange={handleChange} placeholder="Roll Number" required />
+
+        <label htmlFor="class">Class</label>
+        <input type="text" id="class" name="class" value={formData.class} onChange={handleChange} placeholder="Class" required />
+
+        <label htmlFor="voltage">Voltage</label>
+        <input type="text" id="voltage" name="voltage" value={formData.voltage} onChange={handleChange} placeholder="Voltage" readOnly />
+
+        <label htmlFor="current">Current</label>
+        <input type="text" id="current" name="current" value={formData.current} onChange={handleChange} placeholder="Current" readOnly />
+
+        <label htmlFor="watt">Watt</label>
+        <input type="text" id="watt" name="watt" value={formData.watt} onChange={handleChange} placeholder="Watt" readOnly />
+
+        <label htmlFor="average">Average</label>
+        <input type="text" id="average" name="average" value={formData.average} onChange={handleChange} placeholder="Average" readOnly />
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+};
+
+export default Esp32form;
+*/
+
+/* EXAMPLE-2 in this code i need to refresh the webpage 
+import React, { useState, useEffect } from 'react';
+
+const Esp32form= () => {
+  const [sensorData, setSensorData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://192.168.1.23:3000/api/sensordata');
+        
+        // Check for a 403 status code
+        if (response.status === 403) {
+          throw new Error('Unauthorized');
+        }
+  
+        const data = await response.json();
+        setSensorData(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+
+  return (
+    <div>
+      {sensorData ? (
+        <div>
+          <h2>Sensor Data</h2>
+          <p>Voltage: {sensorData.voltage}</p>
+          <p>Current: {sensorData.current}</p>
+          <p>Watt: {sensorData.watt}</p>
+          <p>Average: {sensorData.average}</p>
+        </div>
+      ) : (
+        <p>No sensor data available</p>
+      )}
+    </div>
+  );
+};
+
+export default Esp32form;
+*/
+
+/* EXAMPLE-3 this will fetch the data at regular interval whether as in the previous above code i need to refresh the webpage manually to see the data */
+
 import React, { useState, useEffect } from 'react';
 
 const Esp32form= () => {
@@ -7,7 +145,7 @@ const Esp32form= () => {
 useEffect(() => {
   const fetchData = async () => {
     try {
-      const response = await fetch('http://192.168.1.23:3000/api/sensordata');
+      const response = await fetch('http://192.168.1.29:3000/api/sensordata');
       
       // Check for a 403 status code
       if (response.status === 403) {
@@ -49,7 +187,6 @@ return (
 };
 
 export default Esp32form;
-
 #Step-2 Esp32form.css
 .form-container {
     max-width: 400px;
