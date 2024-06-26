@@ -1,157 +1,64 @@
 //EXAMPLE-1 actually i don't have the DHT sensor so i will send the random data through the http post method
 #include <WiFi.h>
 #include <HTTPClient.h>
-const char *ssid = "Airtel_tejv_3002";  //Nama Wifi
-const char *password = "air73137"; // pass wifi
+
+const char* ssid = "Airtel_tejv_3002";  // WiFi SSID
+const char* password = "air73137";      // WiFi password
 
 void setup() {
-  delay(1000);
   Serial.begin(115200);
-  WiFi.mode(WIFI_OFF);
-  delay(1000);
-  WiFi.mode(WIFI_STA);
 
+  // Connect to WiFi
   WiFi.begin(ssid, password);
-  Serial.println("");
+  Serial.println("Connecting to WiFi");
 
-  Serial.print("Connecting");
-  // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
 
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
+  Serial.println();
+  Serial.println("Connected to WiFi");
   Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());  //IP address assigned to your ESP
+  Serial.println(WiFi.localIP());
 }
 
 void loop() {
+  // Simulate reading sensor data
+  int voltage = random(0, 12);
+  int current = random(0, 3);
+  int watt = random(28, 32);
+  int average = random(50, 95);
 
-  if (Serial.available()) {
-    int a = Serial.parseInt();
+  // Create JSON data
+  String postData = "{\"voltage\":" + String(voltage) + ",\"current\":" + String(current) + ",\"watt\":" + String(watt) + ",\"average\":" + String(average) + "}";
 
-    if (a > 0) {
-      kirim_data();
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String serverPath = "http://192.168.1.29:3000/api/sensordata";  // Replace with the correct IP address and port
+
+    // Log the endpoint and data
+    Serial.println("Posting to: " + serverPath);
+    Serial.println("PostPacket: " + postData);
+    
+    http.begin(serverPath);
+    http.addHeader("Content-Type", "application/json");  // Changed to application/json
+
+    int httpResponseCode = http.POST(postData);
+
+    // Print HTTP response code and payload
+    Serial.print("httpCode: ");
+    Serial.println(httpResponseCode);
+
+    if (httpResponseCode > 0 && httpResponseCode < 400) {
+      String response = http.getString();
+      Serial.println(response);
     }
+
+    http.end();
+  } else {
+    Serial.println("WiFi Disconnected");
   }
 
-}
-
-void kirim_data() {
-
-  int voltage, current, watt, average;
-  voltage = random(0, 12); // voltage data
-  current = random(0, 3); // current data
-  watt = random(28, 32); // watt data
-  average = random(50, 95); // average data
-
-  String postData = (String)"voltage=" + voltage + "&current=" + current
-                    + "&watt=" + watt + "&average=" + average;
-
-  HTTPClient http;
-  http.begin("http://192.168.43.140/postesp8266/api.php");
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-  auto httpCode = http.POST(postData);
-  String payload = http.getString();
-
-  Serial.println(postData);
-  Serial.println(payload);
-
-  http.end();
-}
-
-// EXAMPLE-2 ESP32 with DHT sensor store the data into the database Mysql
-
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include "DHT.h"
-#define DHTPIN 15
-#define DHTTYPE DHT11
-DHT dht(DHTPIN, DHTTYPE);
-
-const char *ssid = "Smart-PF";  //Nama Wifi
-const char *password = "anamganteng"; // pass wifi
-
-float h, t;
-
-void setup() {
-  delay(1000);
-  Serial.begin(9600);
-  WiFi.mode(WIFI_OFF);
-  delay(1000);
-  WiFi.mode(WIFI_STA);
-
-  WiFi.begin(ssid, password);
-  Serial.println("");
-
-  Serial.print("Connecting");
-  // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());  //IP address assigned to your ESP
-  dht.begin();
-}
-
-void loop() {
-
-  if (Serial.available()) {
-    int a = Serial.parseInt();
-
-    if (a > 0) {
-      read_dht();
-      kirim_data();
-    }
-  }
-
-}
-
-void read_dht() {
-  h = dht.readHumidity();
-  t = dht.readTemperature();
-
-  // Check if any reads failed and exit early (to try again).
-  if (isnan(h) || isnan(t)) {
-    Serial.println(F("Failed to read from DHT sensor!"));
-    return;
-  }
-  Serial.print(F("Humidity: "));
-  Serial.print(h);
-  Serial.print(F("%  Temperature: "));
-  Serial.print(t);
-  Serial.println(F("°C "));
-}
-
-void kirim_data() {
-
-  float tegangan, arus, suhu, kelembaban;
-  tegangan = random(0, 12); // ubah dengan data dari sensor
-  arus = random(0, 3); // ubah dengan data dari sensor
-  suhu = t;
-  kelembaban = h;
-
-  String postData = (String)"tegangan=" + tegangan + "&arus=" + arus
-                    + "&suhu=" + suhu + "&kelembaban=" + kelembaban;
-
-  HTTPClient http;
-  http.begin("http://192.168.43.140/postesp8266/api.php");
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-  auto httpCode = http.POST(postData);
-  String payload = http.getString();
-
-  Serial.println(postData);
-  Serial.println(payload);
-
-  http.end();
+  delay(10000);  // Send data every 10 seconds
 }
