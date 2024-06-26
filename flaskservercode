@@ -1,5 +1,6 @@
 # flask server will take the data from the esp32 and store the data and send it with different api to react js in the form
 
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -19,7 +20,7 @@ def receive_sensor_data():
         print(f'Error receiving data: {e}')
         return jsonify({"status": "error"}), 400
 
-@app.route('/api/sensordata', methods=['GET'])
+@app.route('/api/sendsensordata', methods=['GET'])
 def get_sensor_data():
     global sensor_data
     if sensor_data:
